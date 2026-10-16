@@ -1,0 +1,30 @@
+{
+  "name": "pi-pet-reze",
+  "version": "0.3.0",
+  "description": "A blinking Reze pet widget for Pi's terminal UI.",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-coding-agent",
+    "terminal",
+    "tui",
+    "pet"
+  ],
+  "license": "UNLICENSED",
+  "files": [
+    "index.ts",
+    "config.default.json",
+    "assets/",
+    "README.md",
+    "NOTICE"
+  ],
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  }
+}

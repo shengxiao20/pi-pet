@@ -1,0 +1,10 @@
+{
+  "display": {
+    "maxWidthCells": 24,
+    "maxHeightCells": 24,
+    "topMarginCells": 1,
+    "horizontalAlignment": "left",
+    "leftMarginCells": 1,
+    "rightMarginCells": 1
+  }
+}
