@@ -1,21 +1,28 @@
 {
   "name": "pi-pet-reze",
-  "version": "0.3.0",
-  "description": "A blinking Reze pet widget for Pi's terminal UI.",
+  "version": "0.3.3",
+  "description": "Animated Pi terminal pet with distinct working, completed, aborted, and error reactions plus DIY character artwork support.",
   "keywords": [
     "pi-package",
+    "pi-extension",
     "pi",
     "pi-coding-agent",
     "terminal",
     "tui",
-    "pet"
+    "pet",
+    "animation",
+    "custom-images",
+    "working",
+    "aborted",
+    "error"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "files": [
     "index.ts",
     "config.default.json",
     "assets/",
     "README.md",
+    "LICENSE",
     "NOTICE"
   ],
   "pi": {

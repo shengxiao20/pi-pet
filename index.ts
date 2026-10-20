@@ -43,6 +43,8 @@ interface CharacterSource {
 	assetsDirectory: string;
 }
 
+type AnimationName = "idle" | "working" | "completed" | "aborted" | "error";
+
 interface AnimationFrame {
 	data: string;
 	duration: number;
@@ -60,11 +62,17 @@ function getCharacters(): CharacterSource[] {
 	return [...characters.values()].sort((left, right) => left.name.localeCompare(right.name));
 }
 
-function readFrames(character: CharacterSource): readonly AnimationFrame[] {
+function getAnimationDirectory(character: CharacterSource, animation: AnimationName): string {
+	const animationDirectory = join(character.assetsDirectory, character.name, animation);
+	return animation === "idle" || !existsSync(animationDirectory)
+		? join(character.assetsDirectory, character.name)
+		: animationDirectory;
+}
+
+function readFrames(character: CharacterSource, animation: AnimationName): readonly AnimationFrame[] {
+	const animationDirectory = getAnimationDirectory(character, animation);
 	return [1, 2, 3, 2].map((number) => ({
-		data: readFileSync(join(character.assetsDirectory, character.name, `${character.name}${number}.png`)).toString(
-			"base64",
-		),
+		data: readFileSync(join(animationDirectory, `${character.name}${number}.png`)).toString("base64"),
 		duration: number === 1 ? 3_000 : number === 2 ? 90 : 140,
 	}));
 }
@@ -135,18 +143,43 @@ class Pet implements ImageTheme {
 export default function petExtension(pi: ExtensionAPI): void {
 	const characters = getCharacters();
 	let activeCharacter = characters[0];
+	let activeAnimation: AnimationName = "idle";
+	let runOutcome: "completed" | "aborted" | "error" = "completed";
 	let visible = true;
 
 	const setPet = (ctx: ExtensionContext): void => {
 		ctx.ui.setWidget(
 			PET_KEY,
-			visible ? (tui, theme) => new Pet(tui, theme, readFrames(activeCharacter)) : undefined,
+			visible ? (tui, theme) => new Pet(tui, theme, readFrames(activeCharacter, activeAnimation)) : undefined,
 			{ placement: "belowEditor" },
 		);
 	};
 
+	const setAnimation = (animation: AnimationName, ctx: ExtensionContext): void => {
+		const resolvedAnimation = existsSync(join(activeCharacter.assetsDirectory, activeCharacter.name, animation))
+			? animation
+			: "idle";
+		if (activeAnimation === resolvedAnimation) return;
+		activeAnimation = resolvedAnimation;
+		if (ctx.hasUI && visible) setPet(ctx);
+	};
+
 	pi.on("session_start", (_event, ctx) => {
 		if (ctx.hasUI) setPet(ctx);
+	});
+
+	pi.on("before_agent_start", (event, ctx) => {
+		if (event.messageType !== "user") return;
+		runOutcome = "completed";
+		setAnimation("working", ctx);
+	});
+
+	pi.on("agent_before_settle", (event) => {
+		runOutcome = event.outcome;
+	});
+
+	pi.on("agent_settled", (event, ctx) => {
+		setAnimation(event.aborted ? "aborted" : runOutcome, ctx);
 	});
 
 	pi.registerCommand("pet", {

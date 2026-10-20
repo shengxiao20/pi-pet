@@ -1,6 +1,8 @@
 # Reze Pet for Pi
 
-A blinking pet widget for Pi's terminal UI. It includes bundled characters and supports user-added characters without modifying the npm installation.
+Animated Pi terminal pet with distinct working, completed, aborted, and error reactions plus DIY character artwork support.
+
+Bring your own artwork to build a DIY terminal pet: follow the asset layout in [DIY characters and assets](#diy-characters-and-assets) to add a character and its state-specific PNG animations without changing the installed npm package.
 
 ## Requirements
 
@@ -32,6 +34,25 @@ Run:
 ```
 
 The menu lets you show or hide the pet and switch its character. A selected character is shown immediately. Selection is per Pi process; restarting Pi selects the first character folder alphabetically.
+
+## Agent animations
+
+The pet uses one `working` animation for the complete user-request lifecycle, then switches to the final Pi outcome animation:
+
+```text
+User submits a message
+└── working
+    ├── Pi requests the model
+    ├── Pi streams the response
+    └── Pi runs tools
+
+Agent settles
+├── completed → completed
+├── aborted   → aborted
+└── error     → error
+```
+
+`working` begins at Pi's `before_agent_start` event for a user message. Pi may perform automatic retries, recovery, compaction, or queued continuation work; the final outcome animation is selected only after `agent_settled`.
 
 ## User configuration
 
@@ -66,7 +87,9 @@ Edit it, then run `/reload` in Pi:
 
 `config.json` is personal state and is not overwritten by package updates. The npm package contains only `config.default.json`, which seeds this user file once.
 
-## Characters and assets
+## DIY characters and assets
+
+Use your own PNG artwork to create a personal terminal pet. Place it in the documented user asset directory below; no changes to the installed npm package are needed.
 
 Bundled characters are installed under the npm package. Add personal characters under:
 
@@ -74,23 +97,45 @@ Bundled characters are installed under the npm package. Add personal characters 
 ~/.pi/agent/pi-pet-reze/assets/
 ```
 
-Each immediate subdirectory is a selectable character. It must contain three files named after that directory:
+Each immediate subdirectory is a selectable character. It must contain three idle frames named after that directory:
 
 ```text
 ~/.pi/agent/pi-pet-reze/assets/
 └── power/
-    ├── power1.png  # open eyes
-    ├── power2.png  # half blink
-    └── power3.png  # closed eyes
+    ├── power1.png  # idle frame 1
+    ├── power2.png  # idle frame 2
+    ├── power3.png  # idle frame 3
+    ├── working/
+    │   ├── power1.png
+    │   ├── power2.png
+    │   └── power3.png
+    ├── completed/
+    │   ├── power1.png
+    │   ├── power2.png
+    │   └── power3.png
+    ├── aborted/
+    │   ├── power1.png
+    │   ├── power2.png
+    │   └── power3.png
+    └── error/
+        ├── power1.png
+        ├── power2.png
+        └── power3.png
 ```
 
-The animation sequence is:
+Every animation uses this sequence:
 
 ```text
 <character>1.png → <character>2.png → <character>3.png → <character>2.png → repeat
 ```
 
+The root-level files are required and provide the idle animation. The `working`, `completed`, `aborted`, and `error` directories are optional; if one is absent, its state uses the character's idle frames. Outcome directory names exactly match Pi's `AgentActivityOutcome` values.
+
 User character folders are merged with bundled character folders. If both have the same folder name, the user folder takes precedence.
+
+## License
+
+The extension code is licensed under the [MIT License](LICENSE). Bundled Reze artwork remains subject to the separate rights notice in [NOTICE](NOTICE).
 
 ## Attribution
 
