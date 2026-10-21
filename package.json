@@ -1,7 +1,7 @@
 {
   "name": "pi-pet-reze",
-  "version": "0.3.3",
-  "description": "Animated Pi terminal pet with distinct working, completed, aborted, and error reactions plus DIY character artwork support.",
+  "version": "0.3.4",
+  "description": "Animated Pi terminal pet / Pi 终端动态宠物，with working, completed, aborted, and error reactions plus DIY character artwork support / 支持工作、完成、中止和错误状态，以及自定义角色素材。",
   "keywords": [
     "pi-package",
     "pi-extension",

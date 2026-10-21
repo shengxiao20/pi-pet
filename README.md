@@ -140,3 +140,62 @@ The extension code is licensed under the [MIT License](LICENSE). Bundled Reze ar
 ## Attribution
 
 This package includes user-provided Reze character artwork. Ensure you have the rights needed to redistribute the artwork before publishing it publicly.
+
+---
+
+# Pi 的 Reze 宠物（中文）
+
+为 Pi 终端提供会动的宠物。它会分别对**工作中、已完成、已中止和错误**状态作出动画反应，也支持使用自己的角色 PNG 素材。
+
+## 环境要求
+
+- 使用 `regular` TUI 模式的 Pi。
+- 支持原生终端内嵌图片的终端，例如 iTerm2 或 Kitty。
+
+不支持内嵌图片时，Pi 会自动显示文本图片占位符。
+
+## 安装
+
+```bash
+pi install npm:pi-pet-reze
+```
+
+仅在当前项目安装：
+
+```bash
+pi install --local npm:pi-pet-reze
+```
+
+安装后重启 Pi。
+
+## 使用与动画状态
+
+运行 `/pet` 可以显示或隐藏宠物，并切换角色。选中的角色会立刻显示；选择只在当前 Pi 进程内有效，重启后按角色目录名称的字母顺序选择第一个角色。
+
+用户提交消息后，`working` 动画从 `before_agent_start` 开始，覆盖模型请求、流式响应和工具调用。Pi 在 `agent_settled` 后才显示最终结果：`completed`、`aborted` 或 `error`。自动重试、恢复、压缩和排队续跑也都属于工作中阶段。
+
+## 配置
+
+首次加载时会创建个人配置文件：
+
+```text
+~/.pi/agent/pi-pet-reze/config.json
+```
+
+修改后在 Pi 中运行 `/reload`。`maxWidthCells` 和 `maxHeightCells` 限制图片的终端单元格尺寸；`topMarginCells` 设置顶部空白行；`horizontalAlignment` 可为 `"left"` 或 `"right"`；`leftMarginCells` 和 `rightMarginCells` 分别设置对应方向的边距。该文件是个人状态，包更新不会覆盖；npm 包中的 `config.default.json` 只用于首次初始化。
+
+## 自定义角色与素材
+
+将个人角色放入：
+
+```text
+~/.pi/agent/pi-pet-reze/assets/<角色名>/
+```
+
+每个角色目录必须在根目录中提供 `<角色名>1.png`、`<角色名>2.png`、`<角色名>3.png` 三张待机帧。可选的 `working/`、`completed/`、`aborted/` 和 `error/` 子目录各自使用同样命名的三张 PNG；缺少某个状态目录时会回退为待机帧。播放顺序为 `1 → 2 → 3 → 2 → 循环`。
+
+用户角色与包内角色合并；若目录同名，用户角色优先。角色状态目录名称必须与 Pi 的 `AgentActivityOutcome` 值完全一致。
+
+## 许可与署名
+
+扩展代码采用 [MIT License](LICENSE)。随包的 Reze 素材仍受 [NOTICE](NOTICE) 中单独列出的权利声明约束；公开发布前请确认拥有重新分发自定义素材的权利。
